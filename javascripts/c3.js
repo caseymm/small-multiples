@@ -6941,12 +6941,16 @@
 
         function axisX(selection, x) {
             selection.attr("transform", function (d) {
+              if(!(isNaN(x(d)))){
                 return "translate(" + Math.ceil(x(d) + tickOffset) + ", 0)";
+              }
             });
         }
         function axisY(selection, y) {
             selection.attr("transform", function (d) {
+              if(!(isNaN(y(d)))){
                 return "translate(0," + Math.ceil(y(d)) + ")";
+              }
             });
         }
         function scaleExtent(domain) {
@@ -7098,7 +7102,10 @@
                         var splitted = params.tickMultiline ? splitTickText(d, params.tickWidth) : [].concat(textFormatted(d));
                         counts[i] = splitted.length;
                         return splitted.map(function (s) {
-                            return { index: i, splitted: s };
+                          if(s.constructor === Array){
+                            s = '';
+                          }
+                          return { index: i, splitted: s };
                         });
                     });
                 tspan.enter().append('tspan');

@@ -2,12 +2,25 @@
 
   $(document).ready(function() {
     // var small_multiples = [[["Coke", 0.2, 0.6], ["Pepsi", 0.8, 0.4]], [["Coke", 0.75], ["Pepsi", 0.25]], [["Coke", 0.5], ["Pepsi", 0.5]], [["Coke", 0.65], ["Pepsi", 0.35]]];
+    // var small_multiples = {
+    //   "Northeast": [["Success", 0.2, 0.4, 0.8, 0.85, 0.66, 0.4, 0.4, 0.24], ["Failures", 0.2, 0.4, 0.48, 0.85, 0.56, 0.4, 0.3, 0.24]],
+    //   "South": [["Success", 0.75, 0.4, 0.3, 0.5, 0.86, 0.4, 0.8, 0.85], ["Failures", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4]],
+    //   "Midwest": [["Success", 0.5, 0.3, 0.4, 0.4, 0.24, 0.75, 0.4, 0.3], ["Failures", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4]],
+    //   "West": [["Success", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4], ["Failures", 0.2, 0.4, 0.8, 0.85, 0.66, 0.4, 0.4, 0.24]]
+    // };
     var small_multiples = {
-      "Northeast": [["Coke", 0.2, 0.6], ["Pepsi", 0.8, 0.4]],
-      "South": [["Coke", 0.75], ["Pepsi", 0.25]],
-      "Midwest": [["Coke", 0.5], ["Pepsi", 0.5]],
-      "West": [["Coke", 0.65], ["Pepsi", 0.35]]
+      "Northeast": [["Success", 0.2, 0.4, 0.8, 0.85, 0.66, 0.4, 0.4, 0.24]],
+      "South": [["Success", 0.75, 0.4, 0.3, 0.5, 0.86, 0.4, 0.8, 0.85]],
+      "Midwest": [["Success", 0.5, 0.3, 0.4, 0.4, 0.24, 0.75, 0.4, 0.3]],
+      "West": [["Success", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4]]
     };
+    // var small_multiples = {
+    //   "Northeast": [["Coke", 0.2], ["Pepsi", 0.8]],
+    //   "South": [["Coke", 0.75], ["Pepsi", 0.25]],
+    //   "Midwest": [["Coke", 0.5], ["Pepsi", 0.5]],
+    //   "West": [["Coke", 0.65], ["Pepsi", 0.35]]
+    // };
+
     var just_data = [],
         mc_max = 0,
         cat_dict = {},
@@ -26,6 +39,11 @@
 
     mini_charts.append('div')
                .classed('title', true)
+               .style('text-align', function(){
+                 if(window.location.hash){
+                   return 'center';
+                 }
+               })
                .html(function(d, i){
                  return keys[i];
                })
@@ -55,6 +73,14 @@
     mini_charts.each(function(d, i){
       loadChart(i, d);
     })
+
+    function checkFirst(idx){
+      if(idx === 0){
+        return true;
+      } else {
+        return false;
+      }
+    }
 
     var cats = Object.keys(cat_dict);
     var mcs = d3.selectAll('.mini-charts');
@@ -92,22 +118,32 @@
 
     function loadChart(idx, mc_data){
       var chart_dict = {
+        padding:{
+          left: 0
+        },
         size: {
-          height: 200,
-          width: 200
+          height: 100,
+          width: 100
         },
         data: {
           columns: mc_data,
-          type : window.location.hash.slice(1) || 'bar',
-          onclick: function (d, i) { console.log("onclick", d, i); },
-          onmouseover: function (d, i) { console.log("onmouseover", d, i); },
-          onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+          type : window.location.hash.slice(1) || 'bar'
+          // onclick: function (d, i) { console.log("onclick", d, i); },
+          // onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+          // onmouseout: function (d, i) { console.log("onmouseout", d, i); }
         },
         axis: {
+          x: {
+            show: false,
+            tick: {
+              outer: false
+            }
+          },
           y: {
+            show: checkFirst(idx),
             max: mc_max,
             tick: {
-              count: 2
+              outer: false
             }
           }
         }
@@ -115,6 +151,13 @@
       var chart = c3.generate(chart_dict, idx);
       chart.legend.hide();
     }
+
+    d3.selectAll('.tick').each(function(d){
+      // console.log('tick', d, this.textContent)
+      if(d != 0 && d!= mc_max){
+        d3.select(this).remove();
+      }
+    })
 
   });
 })();
