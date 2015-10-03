@@ -1,0 +1,41 @@
+html, body, text{
+  font-family: 'Roboto Slab', serif !important;
+}
+
+#container{
+  /*display: flex;*/
+  /*justify-content: center;*/
+}
+
+#chart-legend{
+  text-align: center;
+}
+
+.charts{
+  /*display: inline-flex !important;*/
+  margin: 0 20px;
+  /*width:170px;
+  height:200px;*/
+  display:inline-block;
+}
+
+.leg-item, .leg-item div{
+  display: inline-block;
+  cursor: pointer;
+}
+
+.leg-item{
+  margin: 0 15px;
+}
+
+.sq-block{
+  width: 12px;
+  height: 12px;
+  margin-right: 10px;
+}
+
+/*//\\//\\ EDITS //\\//\\*/
+.c3 svg, .c3-chart-arc text {
+  font: 9px sans-serif;
+  /*text-anchor: end !important;*/
+}
