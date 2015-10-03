@@ -8,13 +8,15 @@
       "Midwest": [["Coke", 0.5], ["Pepsi", 0.5]],
       "West": [["Coke", 0.65], ["Pepsi", 0.35]]
     };
-    var just_data = [];
-    var keys = Object.keys(small_multiples);
+    var just_data = [],
+        mc_max = 0,
+        cat_dict = {},
+        keys = Object.keys(small_multiples);
+
     for(x in small_multiples){
       just_data.push(small_multiples[x]);
     }
-    var mc_max = 0,
-        cat_dict = {};
+
 
     var mini_charts = d3.select('#container').selectAll('div')
                         .data(just_data)
@@ -77,11 +79,17 @@
              leg_block.append('div').classed('sq-block', true)
                       .each(function (id) {
                         d3.select(this).style('background-color', function(id){
-                          var fill = d3.selectAll('.c3-target-'+id).selectAll('path')[0][0];
-                          return d3.select(fill).style('fill');
+                          var element = d3.selectAll('.c3-target-'+id).selectAll('path')[0][0];
+                          if(typeof element === 'undefined'){
+                            var fill = d3.selectAll('.c3-arc-'+id).style('fill');
+                          } else {
+                            var fill = d3.select(element).style('fill');
+                          }
+                          return fill;
                         });
                       })
              leg_block.append('div').html(function (id) { return id; })
+
     function loadChart(idx, mc_data){
       var chart_dict = {
         size: {
@@ -96,9 +104,6 @@
           onmouseout: function (d, i) { console.log("onmouseout", d, i); }
         },
         axis: {
-          x: {
-            label: ''
-          },
           y: {
             max: mc_max,
             tick: {
