@@ -4,8 +4,9 @@ html, body, text{
 }
 
 #container{
-  /*display: flex;*/
-  /*justify-content: center;*/
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 #chart-legend{

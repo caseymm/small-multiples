@@ -2,18 +2,18 @@
 
   $(document).ready(function() {
     // var small_multiples = [[["Coke", 0.2, 0.6], ["Pepsi", 0.8, 0.4]], [["Coke", 0.75], ["Pepsi", 0.25]], [["Coke", 0.5], ["Pepsi", 0.5]], [["Coke", 0.65], ["Pepsi", 0.35]]];
-    // var small_multiples = {
-    //   "Northeast": [["Success", 0.2, 0.4, 0.8, 0.85, 0.66, 0.4, 0.4, 0.24], ["Failures", 0.2, 0.4, 0.48, 0.85, 0.56, 0.4, 0.3, 0.24]],
-    //   "South": [["Success", 0.75, 0.4, 0.3, 0.5, 0.86, 0.4, 0.8, 0.85], ["Failures", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4]],
-    //   "Midwest": [["Success", 0.5, 0.3, 0.4, 0.4, 0.24, 0.75, 0.4, 0.3], ["Failures", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4]],
-    //   "West": [["Success", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4], ["Failures", 0.2, 0.4, 0.8, 0.85, 0.66, 0.4, 0.4, 0.24]]
-    // };
     var small_multiples = {
-      "Northeast": [["Success", 0.2, 0.4, 0.8, 0.85, 0.66, 0.4, 0.4, 0.24]],
-      "South": [["Success", 0.75, 0.4, 0.3, 0.5, 0.86, 0.4, 0.8, 0.85]],
-      "Midwest": [["Success", 0.5, 0.3, 0.4, 0.4, 0.24, 0.75, 0.4, 0.3]],
-      "West": [["Success", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4]]
+      "Northeast": [["Success", 0.2, 0.4, 0.8, 0.85, 0.66, 0.4, 0.4, 0.24], ["Failures", 0.2, 0.4, 0.48, 0.85, 0.56, 0.4, 0.3, 0.24]],
+      "South": [["Success", 0.75, 0.4, 0.3, 0.5, 0.86, 0.4, 0.8, 0.85], ["Failures", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4]],
+      "Midwest": [["Success", 0.5, 0.3, 0.4, 0.4, 0.24, 0.75, 0.4, 0.3], ["Failures", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4]],
+      "West": [["Success", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4], ["Failures", 0.2, 0.4, 0.8, 0.85, 0.66, 0.4, 0.4, 0.24]]
     };
+    // var small_multiples = {
+    //   "Northeast": [["Success", 0.2, 0.4, 0.8, 0.85, 0.66, 0.4, 0.4, 0.24]],
+    //   "South": [["Success", 0.75, 0.4, 0.3, 0.5, 0.86, 0.4, 0.8, 0.85]],
+    //   "Midwest": [["Success", 0.5, 0.3, 0.4, 0.4, 0.24, 0.75, 0.4, 0.3]],
+    //   "West": [["Success", 0.65, 0.55, 0.76, 0.37, 0.19, 0.3, 0.4, 0.4]]
+    // };
     // var small_multiples = {
     //   "Northeast": [["Coke", 0.2], ["Pepsi", 0.8]],
     //   "South": [["Coke", 0.75], ["Pepsi", 0.25]],
@@ -21,7 +21,8 @@
     //   "West": [["Coke", 0.65], ["Pepsi", 0.35]]
     // };
 
-    var just_data = [],
+    var chart_type = window.location.hash.slice(1),
+        just_data = [],
         mc_max = 0,
         cat_dict = {},
         keys = Object.keys(small_multiples);
@@ -83,7 +84,6 @@
     }
 
     var cats = Object.keys(cat_dict);
-    var mcs = d3.selectAll('.mini-charts');
     var legend_item = d3.select('#chart-legend').append('div').attr('class', 'legend').selectAll('span')
                         .data(cats)
                       .enter().append('span')
@@ -91,11 +91,22 @@
                         .attr('data-id', function (id) { return id; })
 
         legend_item.on('mouseover', function (id) {
-                     d3.selectAll('.c3-target').selectAll('path').style('opacity', 0.3);
-                     d3.selectAll('.c3-target-'+id).selectAll('path').style('opacity', 1);
+                      d3.selectAll('.c3-target').selectAll('path').style('opacity', 0.2);
+                      if(chart_type === 'area'){
+                        console.log(d3.selectAll('.c3-area-'+id).selectAll('path'))
+                        d3.selectAll('.c3-area-'+id).style('opacity', 0.5);
+                        d3.selectAll('.c3-line-'+id).style('opacity', 1);
+                      } else {
+                        d3.selectAll('.c3-target-'+id).selectAll('path').style('opacity', 1);
+                      }
                    })
                    .on('mouseout', function (id) {
-                     d3.selectAll('.c3-target').selectAll('path').style('opacity', 1);
+                     if(chart_type === 'area'){
+                       d3.selectAll('.c3-target').selectAll('path').style('opacity', 0.2);
+                       d3.selectAll('.c3-lines').selectAll('path').style('opacity', 1);
+                     } else {
+                       d3.selectAll('.c3-target').selectAll('path').style('opacity', 1);
+                     }
                    });
 
 
@@ -105,11 +116,14 @@
              leg_block.append('div').classed('sq-block', true)
                       .each(function (id) {
                         d3.select(this).style('background-color', function(id){
-                          var element = d3.selectAll('.c3-target-'+id).selectAll('path')[0][0];
-                          if(typeof element === 'undefined'){
-                            var fill = d3.selectAll('.c3-arc-'+id).style('fill');
+                          var fill;
+                          if(chart_type === 'line' || chart_type === 'area'){
+                            fill = d3.selectAll('.c3-line-'+id).style('stroke');
+                          } else if(chart_type === 'donut' || chart_type === 'pie'){
+                            fill = d3.selectAll('.c3-arc-'+id).style('fill');
                           } else {
-                            var fill = d3.select(element).style('fill');
+                            var element = d3.selectAll('.c3-target-'+id).selectAll('path')[0][0];
+                            fill = d3.select(element).style('fill');
                           }
                           return fill;
                         });
@@ -127,10 +141,14 @@
         },
         data: {
           columns: mc_data,
-          type : window.location.hash.slice(1) || 'bar'
+          type : chart_type || 'bar'
+          // groups: [['Success', 'Failures']]
           // onclick: function (d, i) { console.log("onclick", d, i); },
-          // onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+          // onmouseover: function (d, i) { console.log("onmouseover", d, i); }
           // onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+        },
+        point: {
+          r: 0
         },
         axis: {
           x: {
