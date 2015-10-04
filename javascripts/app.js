@@ -21,9 +21,13 @@
     //   "West": [["Coke", 0.65], ["Pepsi", 0.35]]
     // };
 
-    var chart_type = window.location.hash.slice(1),
+    var hash = window.location.hash.slice(1),
+        ha = hash.split('&'),
+        chart_type = ha[0],
+        grouped = false,
         just_data = [],
         mc_max = 0,
+        grouped_max = 0,
         cat_dict = {},
         keys = Object.keys(small_multiples);
 
@@ -56,6 +60,7 @@
                });
 
     mini_charts.each(function(d, i){
+      groupedMax(d);
       for(j in d){
         var name = d[j].shift();
         if(!(cat_dict[name])){
@@ -71,9 +76,32 @@
       }
     })
 
+    var cats = Object.keys(cat_dict);
+    if(ha[1] && ha[1] === 'grouped'){
+      grouped = [cats];
+      mc_max = grouped_max;
+    }
+
     mini_charts.each(function(d, i){
       loadChart(i, d);
     })
+
+    function groupedMax(d){
+      var get_maxes = _.unzip(d);
+      get_maxes.shift();
+      var na = new Array(get_maxes.length);
+      for(a in get_maxes){
+        na[a] = 0;
+        for(n in get_maxes[a]){
+          na[a] += get_maxes[a][n];
+        }
+      }
+      _.max(na, function(val){
+        if(val > grouped_max){
+          grouped_max = val;
+        }
+      });
+    }
 
     function checkFirst(idx){
       if(idx === 0){
@@ -83,7 +111,6 @@
       }
     }
 
-    var cats = Object.keys(cat_dict);
     var legend_item = d3.select('#chart-legend').append('div').attr('class', 'legend').selectAll('span')
                         .data(cats)
                       .enter().append('span')
@@ -93,7 +120,6 @@
         legend_item.on('mouseover', function (id) {
                       d3.selectAll('.c3-target').selectAll('path').style('opacity', 0.2);
                       if(chart_type === 'area'){
-                        console.log(d3.selectAll('.c3-area-'+id).selectAll('path'))
                         d3.selectAll('.c3-area-'+id).style('opacity', 0.5);
                         d3.selectAll('.c3-line-'+id).style('opacity', 1);
                       } else {
@@ -132,39 +158,39 @@
 
     function loadChart(idx, mc_data){
       var chart_dict = {
-        padding:{
-          left: 0
-        },
-        size: {
-          height: 100,
-          width: 100
-        },
-        data: {
-          columns: mc_data,
-          type : chart_type || 'bar'
-          // groups: [['Success', 'Failures']]
-          // onclick: function (d, i) { console.log("onclick", d, i); },
-          // onmouseover: function (d, i) { console.log("onmouseover", d, i); }
-          // onmouseout: function (d, i) { console.log("onmouseout", d, i); }
-        },
-        point: {
-          r: 0
-        },
-        axis: {
-          x: {
-            show: false,
-            tick: {
-              outer: false
+            padding:{
+              left: 0
+            },
+            size: {
+              height: 100,
+              width: 100
+            },
+            data: {
+              columns: mc_data,
+              type : chart_type || 'bar',
+              groups: grouped
+              // onclick: function (d, i) { console.log("onclick", d, i); },
+              // onmouseover: function (d, i) { console.log("onmouseover", d, i); }
+              // onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+            },
+            point: {
+              r: 0
+            },
+            axis: {
+              x: {
+                show: false,
+                tick: {
+                  outer: false
+                }
+              },
+              y: {
+                show: checkFirst(idx),
+                max: mc_max,
+                tick: {
+                  outer: false
+                }
+              }
             }
-          },
-          y: {
-            show: checkFirst(idx),
-            max: mc_max,
-            tick: {
-              outer: false
-            }
-          }
-        }
       };
       var chart = c3.generate(chart_dict, idx);
       chart.legend.hide();
